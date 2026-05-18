@@ -17,7 +17,6 @@ import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
-import aiRoutes from "./routes/aichatRoutes.js";
 
 const app = express();
 // Serve Swagger UI documentation
@@ -41,7 +40,6 @@ app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
-app.use("/api/ai", aiRoutes);
 
 // Root route (simple test)
 app.get("/", (req, res) => {
