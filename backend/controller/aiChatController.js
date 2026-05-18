@@ -1,23 +1,29 @@
 import { getReply } from "../config/openRouter.js";
 
-
 export const response = async (req, res) => {
   try {
     const { message } = req.body;
 
-    if (!message) {
+    if (typeof message !== "string" || !message.trim()) {
       return res.status(400).json({
+        type: "chat",
         message: "Message is required",
       });
     }
 
-    const aiResponse = await getReply({ prompt: message });
+    const cleanMessage = message.trim();
+
+    const aiResponse = await getReply({ prompt: cleanMessage });
 
     console.log("AI RAW RESPONSE:", aiResponse);
 
     let parsedResponse;
 
-    if (typeof aiResponse === "string") {
+    if (typeof aiResponse === "object") {
+      parsedResponse = aiResponse;
+    } 
+
+    else if (typeof aiResponse === "string") {
       try {
         parsedResponse = JSON.parse(aiResponse);
       } catch {
@@ -26,8 +32,13 @@ export const response = async (req, res) => {
           message: aiResponse,
         };
       }
-    } else {
-      parsedResponse = aiResponse;
+    } 
+    
+    else {
+      parsedResponse = {
+        type: "chat",
+        message: "Unexpected AI response format",
+      };
     }
 
     return res.status(200).json(parsedResponse);

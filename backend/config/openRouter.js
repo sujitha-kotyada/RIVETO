@@ -1,62 +1,68 @@
-import {OpenRouter} from "@openrouter/sdk";
-import dotenv from 'dotenv'
+import OpenAI from "openai";
+import dotenv from "dotenv";
+
 dotenv.config();
-const client = new OpenRouter({
+const client = new OpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
-export const getReply = async ({prompt}) => {
+// Main function
+export const getReply = async ({ prompt }) => {
   try {
-    const response = await client.chat.send({
-      chatRequest: {
-        model: "deepseek/deepseek-chat-v3.1",
-        temperature: 0.2,
-        maxTokens: 100,
-        messages: [
-          {
-            role: "system",
-            content: `You are RIVETO AI Assistant.
-                 Rules:
-                    - Keep replies short.
-                    - Help users navigate pages.
-                    - Return ONLY valid JSON.
-                    - If navigation needed:
-                    {
-                    "type":"navigate",
-                    "route":"route_here",
-                    "message":"short message"
-                    }
+    const response = await client.chat.completions.create({
+      model: "deepseek/deepseek-chat-v3.1",
 
-                    - If normal chat:
-                    {
-                    "type":"chat",
-                    "message":"reply_here"
-                    }
+      temperature: 0.2,
+      max_tokens: 150,
 
-                    Routes:
-                    Home=/
-                    About=/about
-                    Collection=/collection
-                    NewArrivals=/new-arrivals
-                    BestSellers=/best-sellers
-                    Contact=/contact
-                    Cart=/cart
-                    Order=/order
-                    FAQ=/faq
-                    PlaceOrder=/placeorder
-                    Privacy=/privicypolicy
-                    Terms=/termsandservices
-                    SizeGuide=/size-guide
-                    Cookie=/cookie-policy
-                    Contributors=/contributors`,
-          },
+      messages: [
+        {
+          role: "system",
+          content: `
+You are RIVETO AI Assistant.
 
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-      },
+Rules:
+- Keep replies short and useful.
+- Help users navigate website pages.
+- ALWAYS return valid JSON only.
+
+If navigation is needed:
+{
+  "type": "navigate",
+  "route": "/route_here",
+  "message": "short message"
+}
+
+If normal chat:
+{
+  "type": "chat",
+  "message": "reply_here"
+}
+
+Routes:
+Home=/ 
+About=/about
+Collection=/collection
+NewArrivals=/new-arrivals
+BestSellers=/best-sellers
+Contact=/contact
+Cart=/cart
+Order=/order
+FAQ=/faq
+PlaceOrder=/placeorder
+Privacy=/privicypolicy
+Terms=/termsandservices
+SizeGuide=/size-guide
+Cookie=/cookie-policy
+Contributors=/contributors
+          `.trim(),
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
     });
 
     const reply = response.choices[0].message.content
@@ -64,11 +70,20 @@ export const getReply = async ({prompt}) => {
       .replace(/```/g, "")
       .trim();
 
-    return reply;
-  } catch (e) {
+    try {
+      return JSON.parse(reply);
+    } catch (err) {
+      return {
+        type: "chat",
+        message: content || "No response from AI",
+      };
+    }
+  } catch (error) {
+    console.error("OpenRouter Error:", error);
+
     return {
       type: "chat",
-      message: "Something went wrong",
+      message: "Something went wrong. Please try again.",
     };
   }
 };
