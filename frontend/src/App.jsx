@@ -27,13 +27,19 @@ import CookiePolicy from './pages/CookiePolicy';
 import Contributors from './pages/Contributors';
 import NewArrivals from './pages/NewArrivals';
 import BestSellers from './pages/BestSellers';
+import Recommendations from './pages/Recommendations';
 import { shopDataContext } from './context/ShopContext';
 import ComparisonPanel from './components/ComparisonPanel';
-import { RiPriceTag3Line } from "react-icons/ri";
+import { RiPriceTag3Line } from 'react-icons/ri';
 
 function App() {
   const { userData } = useContext(userDataContext);
-  const { compareList, comparePanelOpen, toggleComparePanel, removeFromCompare } = useContext(shopDataContext);
+  const {
+    compareList,
+    comparePanelOpen,
+    toggleComparePanel,
+    removeFromCompare,
+  } = useContext(shopDataContext);
   const location = useLocation();
   const hideNavRoutes = ['/login', '/signup'];
   const shouldShowNav = !hideNavRoutes.includes(location.pathname);
@@ -48,18 +54,14 @@ function App() {
         <Route
           path="/login"
           element={
-            userData ? (
-              <Navigate to={location.state?.from || "/"} />
-            ) : (
-              <Login />
-            )
+            userData ? <Navigate to={location.state?.from || '/'} /> : <Login />
           }
         />
         <Route
           path="/signup"
           element={
             userData ? (
-              <Navigate to={location.state?.from || "/"} />
+              <Navigate to={location.state?.from || '/'} />
             ) : (
               <Registration />
             )
@@ -112,6 +114,16 @@ function App() {
           element={
             userData ? (
               <BestSellers />
+            ) : (
+              <Navigate to="/login" state={{ from: location.pathname }} />
+            )
+          }
+        />
+        <Route
+          path="/recommendations"
+          element={
+            userData ? (
+              <Recommendations />
             ) : (
               <Navigate to="/login" state={{ from: location.pathname }} />
             )
@@ -191,38 +203,13 @@ function App() {
         />
 
         {/* Public routes - Legal pages should be accessible without login */}
-        <Route
-          path="/privicypolicy"
-          element={
-            <PrivicyPolicy />
-          }
-        />
-        <Route
-          path="/termsandservices"
-          element={
-            <TermsAndServices />
-          }
-        />
-        <Route
-          path="/size-guide"
-          element={
-            <SizeGuide />
-          }
-        />
-        <Route
-          path="/cookie-policy"
-          element={
-            <CookiePolicy />
-          }
-        />
-        <Route
-          path="/contributors"
-          element={
-            <Contributors />
-          }
-        />
+        <Route path="/privicypolicy" element={<PrivicyPolicy />} />
+        <Route path="/termsandservices" element={<TermsAndServices />} />
+        <Route path="/size-guide" element={<SizeGuide />} />
+        <Route path="/cookie-policy" element={<CookiePolicy />} />
+        <Route path="/contributors" element={<Contributors />} />
 
-        <Route path='*' element={<NotFound />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Ai />
 

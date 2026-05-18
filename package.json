@@ -17,10 +17,10 @@
       "prettier --write"
     ],
     "frontend/**/*.{js,jsx}": [
-      "npm exec --prefix frontend -- eslint --fix"
+      "npm exec --prefix frontend -- eslint --config frontend/eslint.config.js --fix"
     ],
     "backend/**/*.js": [
-      "npm exec --prefix backend -- eslint --fix"
+      "npm exec --prefix backend -- eslint --config backend/eslint.config.js --fix"
     ]
   }
 }

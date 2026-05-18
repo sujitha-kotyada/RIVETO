@@ -1,13 +1,12 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
-import logo from '../assets/logof.png';
-import { IoSearchCircleOutline, IoSearchCircleSharp } from "react-icons/io5";
-import { FaUserCircle } from "react-icons/fa";
-import { MdOutlineShoppingCart, MdLogout } from "react-icons/md";
-import { IoMdHome } from "react-icons/io";
-import { HiOutlineCollection, HiOutlineUserGroup } from "react-icons/hi";
-import { RiContactsLine } from "react-icons/ri";
-import { BsMoon, BsSun, BsSearch, BsBoxSeam } from "react-icons/bs";
-import { FiInfo, FiUser, FiLogIn } from "react-icons/fi";
+import { IoSearchCircleOutline, IoSearchCircleSharp } from 'react-icons/io5';
+import { FaUserCircle } from 'react-icons/fa';
+import { MdOutlineShoppingCart, MdLogout } from 'react-icons/md';
+import { IoMdHome } from 'react-icons/io';
+import { HiOutlineCollection, HiOutlineUserGroup } from 'react-icons/hi';
+import { RiContactsLine } from 'react-icons/ri';
+import { BsMoon, BsSun, BsSearch, BsBoxSeam } from 'react-icons/bs';
+import { FiInfo, FiUser, FiLogIn } from 'react-icons/fi';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { userDataContext } from '../context/UserContext';
@@ -19,7 +18,8 @@ import gsap from 'gsap';
 function Nav() {
   const { getCurrentUser, userData } = useContext(userDataContext);
   const { serverUrl } = useContext(authDataContext);
-  const { showSearch, setShowSearch, search, setSearch, getCartCount } = useContext(shopDataContext);
+  const { showSearch, setShowSearch, search, setSearch, getCartCount } =
+    useContext(shopDataContext);
   const { theme, toggleTheme } = useContext(ThemeContext);
 
   const [showProfile, setShowProfile] = useState(false);
@@ -44,14 +44,19 @@ function Nav() {
 
   // Initial animations
   useEffect(() => {
-    gsap.from(logoRef.current, { opacity: 0, x: -30, duration: 0.8, ease: 'power2.out' });
+    gsap.from(logoRef.current, {
+      opacity: 0,
+      x: -30,
+      duration: 0.8,
+      ease: 'power2.out',
+    });
     gsap.from(navRef.current?.children, {
       opacity: 0,
       y: -15,
       duration: 0.6,
       stagger: 0.1,
       delay: 0.3,
-      ease: 'power2.out'
+      ease: 'power2.out',
     });
     gsap.from(iconsRef.current?.children, {
       opacity: 0,
@@ -59,14 +64,15 @@ function Nav() {
       duration: 0.6,
       stagger: 0.1,
       delay: 0.5,
-      ease: 'power2.out'
+      ease: 'power2.out',
     });
   }, []);
 
   // Profile dropdown animation
   useEffect(() => {
     if (showProfile && profileRef.current) {
-      gsap.fromTo(profileRef.current,
+      gsap.fromTo(
+        profileRef.current,
         { opacity: 0, y: -10, scale: 0.95 },
         { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: 'power1.out' }
       );
@@ -76,7 +82,8 @@ function Nav() {
   // Search bar animation
   useEffect(() => {
     if (showSearch && searchRef.current) {
-      gsap.fromTo(searchRef.current,
+      gsap.fromTo(
+        searchRef.current,
         { opacity: 0, height: 0 },
         { opacity: 1, height: 'auto', duration: 0.4, ease: 'power2.out' }
       );
@@ -85,56 +92,83 @@ function Nav() {
 
   const handleLogout = async () => {
     try {
-      await axios.get(serverUrl + "/api/auth/logout", { withCredentials: true });
+      await axios.get(serverUrl + '/api/auth/logout', {
+        withCredentials: true,
+      });
       getCurrentUser();
-      navigate("/login");
+      navigate('/login');
     } catch (error) {
-      console.error("Logout Error:", error);
+      console.error('Logout Error:', error);
     }
   };
 
   return (
-    <header className={`w-full fixed top-0 left-0 z-50 transition-all duration-300 ${isScrolled ? 'shadow-lg bg-white/95 dark:bg-[#0B0F1A]/95 backdrop-blur-xl' : 'bg-white/80 dark:bg-[#0B0F1A]/80 backdrop-blur-md'} border-b border-gray-200/50 dark:border-gray-800/50`}>
+    <header
+      className={`w-full fixed top-0 left-0 z-50 transition-all duration-300 ${isScrolled ? 'shadow-lg bg-white/95 dark:bg-[#0B0F1A]/95 backdrop-blur-xl' : 'bg-white/80 dark:bg-[#0B0F1A]/80 backdrop-blur-md'} border-b border-gray-200/50 dark:border-gray-800/50`}
+    >
       <div className="max-w-[1440px] mx-auto px-3 md:px-6 flex justify-between items-center h-15">
         {/* Logo */}
-        <div ref={logoRef} className="flex items-center gap-5 cursor-pointer" onClick={() => navigate('/')}>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <div
+          ref={logoRef}
+          className="flex items-center gap-5 cursor-pointer"
+          onClick={() => navigate('/')}
+        >
+          <h1
+            className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white"
+            style={{ fontFamily: 'Poppins, sans-serif' }}
+          >
             Riveto
           </h1>
         </div>
 
         {/* Desktop Navigation */}
-        <nav ref={navRef} className="hidden md:flex gap-12 text-sm font-medium cursor-pointer">
-          {['Home', 'Collection', 'Contributors', 'About', 'Contact'].map((item) => {
-            const path = item.toLowerCase() === 'home' ? '/' : `/${item.toLowerCase()}`;
+        <nav
+          ref={navRef}
+          className="hidden md:flex gap-12 text-sm font-medium cursor-pointer"
+        >
+          {[
+            { label: 'Home', path: '/' },
+            { label: 'Collection', path: '/collection' },
+            { label: 'Contributors', path: '/contributors' },
+            { label: 'Recommendations', path: '/recommendations' },
+            { label: 'About', path: '/about' },
+            { label: 'Contact', path: '/contact' },
+          ].map((item) => {
+            const path = item.path;
+            const label = item.label;
             const isActive = location.pathname === path;
             return (
               <button
-                key={item}
+                key={label}
                 onClick={() => navigate(path)}
                 className={`relative py-2 transition-colors cursor-pointer ${
-                  isActive 
-                    ? 'text-[#2563EB] font-semibold' 
+                  isActive
+                    ? 'text-[#2563EB] font-semibold'
                     : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                {item}
-                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#2563EB] transition-all duration-300 ${
-                  isActive ? 'w-full' : 'w-0'
-                }`}></span>
+                {label}
+                <span
+                  className={`absolute -bottom-1 left-0 h-0.5 bg-[#2563EB] transition-all duration-300 ${
+                    isActive ? 'w-full' : 'w-0'
+                  }`}
+                ></span>
               </button>
             );
           })}
         </nav>
 
         {/* Icons Section */}
-        <div ref={iconsRef} className="flex items-center gap-4 md:gap-5 relative">
+        <div
+          ref={iconsRef}
+          className="flex items-center gap-4 md:gap-5 relative"
+        >
           {/* Search Icon */}
           <button
             onClick={() => {
               setShowSearch(!showSearch);
-              if (!showSearch) navigate("/collection");
+              if (!showSearch) navigate('/collection');
             }}
             className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Search"
@@ -152,7 +186,7 @@ function Nav() {
             className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Toggle Theme"
           >
-            {theme === "dark" ? (
+            {theme === 'dark' ? (
               <BsSun className="text-yellow-400 text-lg" />
             ) : (
               <BsMoon className="text-gray-700 text-lg" />
@@ -176,7 +210,7 @@ function Nav() {
 
           {/* Shopping Cart */}
           <button
-            onClick={() => navigate("/cart")}
+            onClick={() => navigate('/cart')}
             className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
             aria-label="Shopping Cart"
           >
@@ -192,7 +226,10 @@ function Nav() {
 
       {/* Search Bar */}
       {showSearch && (
-        <div ref={searchRef} className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 flex justify-center border-t border-gray-200 dark:border-gray-700">
+        <div
+          ref={searchRef}
+          className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 flex justify-center border-t border-gray-200 dark:border-gray-700"
+        >
           <div className="w-full md:w-[60%] relative">
             <BsSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" />
             <input
@@ -237,41 +274,62 @@ function Nav() {
             {!userData ? (
               <button
                 className="w-full px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#1a2332] cursor-pointer transition-all duration-200 flex items-center gap-3 group text-left"
-                onClick={() => { navigate("/login"); setShowProfile(false); }}
+                onClick={() => {
+                  navigate('/login');
+                  setShowProfile(false);
+                }}
               >
                 <div className="w-9 h-9 rounded-lg bg-green-50 dark:bg-green-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <FiLogIn className="w-5 h-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">Login</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Access your account</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    Login
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Access your account
+                  </p>
                 </div>
               </button>
             ) : null}
-            
+
             <button
               className="w-full px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#1a2332] cursor-pointer transition-all duration-200 flex items-center gap-3 group text-left"
-              onClick={() => { navigate("/order"); setShowProfile(false); }}
+              onClick={() => {
+                navigate('/order');
+                setShowProfile(false);
+              }}
             >
               <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <BsBoxSeam className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Orders</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Track your purchases</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Orders
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Track your purchases
+                </p>
               </div>
             </button>
 
             <button
               className="w-full px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#1a2332] cursor-pointer transition-all duration-200 flex items-center gap-3 group text-left"
-              onClick={() => { navigate("/about"); setShowProfile(false); }}
+              onClick={() => {
+                navigate('/about');
+                setShowProfile(false);
+              }}
             >
               <div className="w-9 h-9 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <FiInfo className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">About</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Learn more about us</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  About
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Learn more about us
+                </p>
               </div>
             </button>
           </div>
@@ -283,14 +341,21 @@ function Nav() {
               <div className="py-2">
                 <button
                   className="w-full px-4 py-3 hover:bg-red-50 dark:hover:bg-red-500/10 cursor-pointer transition-all duration-200 flex items-center gap-3 group text-left"
-                  onClick={() => { handleLogout(); setShowProfile(false); }}
+                  onClick={() => {
+                    handleLogout();
+                    setShowProfile(false);
+                  }}
                 >
                   <div className="w-9 h-9 rounded-lg bg-red-50 dark:bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <MdLogout className="w-5 h-5 text-red-600 dark:text-red-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-red-600 dark:text-red-400">Logout</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Sign out of your account</p>
+                    <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                      Logout
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Sign out of your account
+                    </p>
                   </div>
                 </button>
               </div>
@@ -302,10 +367,18 @@ function Nav() {
       {/* Mobile Bottom Navigation */}
       <div className="fixed bottom-0 left-0 w-full md:hidden h-16 bg-white dark:bg-[#121826] border-t border-gray-200 dark:border-gray-800 flex items-center justify-around z-40 shadow-lg">
         {[
-          { icon: IoMdHome, label: "Home", path: "/" },
-          { icon: HiOutlineCollection, label: "Collection", path: "/collection" },
-          { icon: HiOutlineUserGroup, label: "Contributors", path: "/contributors" },
-          { icon: RiContactsLine, label: "Contact", path: "/contact" },
+          { icon: IoMdHome, label: 'Home', path: '/' },
+          {
+            icon: HiOutlineCollection,
+            label: 'Collection',
+            path: '/collection',
+          },
+          {
+            icon: HiOutlineUserGroup,
+            label: 'Contributors',
+            path: '/contributors',
+          },
+          { icon: RiContactsLine, label: 'Contact', path: '/contact' },
         ].map((item, index) => {
           const isActive = location.pathname === item.path;
           return (
@@ -313,31 +386,43 @@ function Nav() {
               key={index}
               onClick={() => navigate(item.path)}
               className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl transition-all ${
-                isActive 
-                  ? 'bg-[#2563EB]/10' 
+                isActive
+                  ? 'bg-[#2563EB]/10'
                   : 'hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
             >
-              <item.icon className={`w-5 h-5 ${
-                isActive 
-                  ? 'text-[#2563EB]' 
-                  : 'text-gray-700 dark:text-gray-300'
-              }`} />
-              <span className={`text-xs mt-1 ${
-                isActive 
-                  ? 'text-[#2563EB] font-semibold' 
-                  : 'text-gray-600 dark:text-gray-400'
-              }`} style={{ fontFamily: 'Inter, sans-serif' }}>{item.label}</span>
+              <item.icon
+                className={`w-5 h-5 ${
+                  isActive
+                    ? 'text-[#2563EB]'
+                    : 'text-gray-700 dark:text-gray-300'
+                }`}
+              />
+              <span
+                className={`text-xs mt-1 ${
+                  isActive
+                    ? 'text-[#2563EB] font-semibold'
+                    : 'text-gray-600 dark:text-gray-400'
+                }`}
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                {item.label}
+              </span>
             </button>
           );
         })}
 
         <button
           className="relative flex flex-col items-center justify-center w-16 h-16 rounded-xl transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-          onClick={() => navigate("/cart")}
+          onClick={() => navigate('/cart')}
         >
           <MdOutlineShoppingCart className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-          <span className="text-xs mt-1 text-gray-600 dark:text-gray-400" style={{ fontFamily: 'Inter, sans-serif' }}>Cart</span>
+          <span
+            className="text-xs mt-1 text-gray-600 dark:text-gray-400"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            Cart
+          </span>
           {getCartCount() > 0 && (
             <span className="absolute top-2 right-4 bg-[#EF4444] text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
               {getCartCount()}
