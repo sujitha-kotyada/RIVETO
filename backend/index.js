@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-console.log(process.env.MONGODB_URI);
+
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './Swagger.js'; // Note: The .js extension is required for ES modules!
 
