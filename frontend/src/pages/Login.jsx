@@ -179,34 +179,52 @@ function Login() {
     }
   };
 
-  const googleLogin = async () => {
-    setGoogleLoading(true);
-    try {
-      const response = await signInWithPopup(auth, provider);
-      const user = response.user;
+const googleLogin = async () => {
+  setGoogleLoading(true);
+  try {
+    const response = await signInWithPopup(auth, provider);
+    const user = response.user;
 
-      await axios.post(
-        `${serverUrl}/api/auth/googlelogin`,
-        {
-          name: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL
-        },
-        { withCredentials: true }
-      );
+    await axios.post(
+      `${serverUrl}/api/auth/googlelogin`,
+      {
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL
+      },
+      { withCredentials: true }
+    );
 
-      toast.success("🎉 Google login successful!");
-      setTimeout(() => {
-        getCurrentUser();
-        navigate("/");
-      }, 500);
-    } catch (err) {
-      toast.error("Google login failed. Please try again.");
-    } finally {
-      setGoogleLoading(false);
+    toast.success("🎉 Google login successful!");
+    setTimeout(() => {
+      getCurrentUser();
+      navigate("/");
+    }, 500);
+  } catch (err) {
+    // Firebase specific error codes
+    const code = err?.code;
+
+    if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+      toast.info("Login cancelled. Try again when you're ready.");
+    } else if (code === "auth/popup-blocked") {
+      toast.warning("⚠️ Popup was blocked by your browser. Please allow popups for this site and try again.");
+    } else if (code === "auth/network-request-failed") {
+      toast.error("🌐 Network error. Please check your internet connection.");
+    } else if (code === "auth/user-disabled") {
+      toast.error("🚫 This account has been disabled. Please contact support.");
+    } else if (err?.response?.status === 500) {
+      toast.error("🔧 Server error during Google login. Please try again later.");
+    } else if (err?.response?.data?.message) {
+      toast.error(err.response.data.message);
+    } else {
+      toast.error("Google login failed. Please try again or use email instead.");
     }
-  };
 
+    console.error("Google login error:", err);
+  } finally {
+    setGoogleLoading(false);
+  }
+};
   if (preload) {
     return (
       <div className="fixed inset-0 z-50 overflow-hidden bg-[#0B0F1A] flex items-center justify-center">
