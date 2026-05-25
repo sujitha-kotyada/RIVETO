@@ -32,7 +32,7 @@ function Card({
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isAddingToCart, _setIsAddingToCart] = useState(false);
 
   const cardRef = useRef(null);
 

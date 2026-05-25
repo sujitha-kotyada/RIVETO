@@ -1,7 +1,6 @@
-import React, { useContext, useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { shopDataContext } from '../context/ShopContext';
 import { useNavigate } from 'react-router-dom';
-import { FaHeart, FaTrash } from 'react-icons/fa';
 
 function Wishlist() {
   const {

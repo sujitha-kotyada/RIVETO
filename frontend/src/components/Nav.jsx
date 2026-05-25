@@ -1,4 +1,4 @@
-import React, {
+import {
   useContext,
   useState,
   useRef,
@@ -8,34 +8,15 @@ import React, {
 
 import { useFocusTrap, useEscapeKey } from '../hooks/useDialogA11y';
 
-import { IoSearchCircleOutline } from 'react-icons/io5';
-import { FaUserCircle, FaHeart } from 'react-icons/fa';
-
-import {
-  MdOutlineShoppingCart,
-  MdLogout,
-} from 'react-icons/md';
 
 import { IoMdHome } from 'react-icons/io';
 
 import {
-  HiOutlineCollection,
-  HiOutlineUserGroup,
+  HiOutlineCollection
 } from 'react-icons/hi';
 
 import { RiContactsLine } from 'react-icons/ri';
 
-import {
-  BsMoon,
-  BsSun,
-  BsSearch,
-  BsBoxSeam,
-} from 'react-icons/bs';
-
-import {
-  FiInfo,
-  FiLogIn,
-} from 'react-icons/fi';
 
 import { useNavigate, useLocation } from 'react-router-dom';
 

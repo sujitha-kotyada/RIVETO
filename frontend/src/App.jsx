@@ -3,10 +3,6 @@ import { useLocation } from 'react-router-dom';
 import './App.css';
 import { userDataContext } from './context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
-import NotFound from './pages/NotFound';
-import Ai from './components/Ai';
-import FaqPage from './pages/FaqPage';
-import Wishlist from './pages/wishlist'
 
 import { shopDataContext } from './context/ShopContext';
 

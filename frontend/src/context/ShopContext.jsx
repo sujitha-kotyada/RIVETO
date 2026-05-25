@@ -14,7 +14,6 @@ function ShopContext({ children }) {
   const [showSearch, setShowSearch] = useState(false);
   const [cartItem, setCartItem] = useState({});
   const [compareList, setCompareList] = useState([]);
-  const [wishlistItem, setWishlistItem] = useState([]);
   const [comparePanelOpen, setComparePanelOpen] = useState(false);
  
   const { serverUrl } = useContext(authDataContext);
