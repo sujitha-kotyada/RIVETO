@@ -78,8 +78,8 @@ function Registration() {
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
     }
 
     setErrors(newErrors);
@@ -109,47 +109,45 @@ function Registration() {
     setLoading(true);
 
     try {
-      const res = await axios.post(
+      await axios.post(
         `${serverUrl}/api/auth/send-otp`,
         formData,
         { withCredentials: true }
       );
 
-      toast.success('OTP send successfully 🎉');
-      setStep("2");
+      toast.success('OTP sent successfully 🎉');
+      setStep('2');
     } catch (error) {
-      console.error("OTP ERROR:", error);
+      console.error('OTP ERROR:', error);
       toast.error(
-        error.response?.data?.message || "Failed to send OTP"
+        error.response?.data?.message || 'Failed to send OTP'
       );
 
     } finally {
-      setLoading(false); // 🔥 FIX: prevents stuck button
+      setLoading(false);
     }
   };
 
   const verifyOtp = async () => {
     setOtpLoading(true);
 
-  try {
-    await axios.post(`${serverUrl}/api/auth/verify-otp`, {
-      email: formData.email,
-      otp,
-    },{withCredentials: true});
+    try {
+      await axios.post(`${serverUrl}/api/auth/verify-otp`, {
+        email: formData.email,
+        otp,
+      }, { withCredentials: true });
 
-    toast.success("Account verified successfully 🎉");
+      toast.success('Account verified successfully 🎉');
+      getCurrentUser();
+      navigate('/');
 
-    getCurrentUser();
-    navigate("/");
-  } catch (error) {
-    console.error(error);
-    const msg =
-      error.response?.data?.message || "OTP verification failed";
-    toast.error(msg);
-  } finally {
-    setOtpLoading(false);
-  }
-};
+    } catch (error) {
+      console.error('OTP Verification Error:', error);
+      toast.error(error.response?.data?.message || 'OTP verification failed');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
 
   const googleSignup = async () => {
     setGoogleLoading(true);
