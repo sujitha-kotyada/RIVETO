@@ -5,6 +5,7 @@ import { userDataContext } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import sound from '../assets/swift-sound.mp3';
+import { X, Mic, MicOff, MessageCircle } from 'lucide-react';
 
   const placeholders =[
     "search",
