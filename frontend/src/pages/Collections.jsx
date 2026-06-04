@@ -1,7 +1,11 @@
 import { useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { useFocusTrap, useEscapeKey } from '../hooks/useDialogA11y';
-
 import { shopDataContext } from '../context/ShopContext';
+import Card from '../components/Card';
+import Footer from '../components/Footer';
+import { RiPriceTag3Line, RiArrowUpDownLine } from 'react-icons/ri';
+import { FaStar, FaSearch, FaFilter, FaTimes } from 'react-icons/fa';
+import { LoadingState, EmptyState, ErrorState } from '../components/StateComponents';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -222,6 +226,7 @@ function Collections() {
     product,
     pagination,
     loadingProducts,
+    productsError,
     getProducts,
     search,
     showSearch,
@@ -497,15 +502,14 @@ function Collections() {
             </div>
 
             {/* Product Grid */}
-            {isLoading ? (
-              <div className="space-y-8">
-                <Loader />
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                  {[...Array(8)].map((_, index) => (
-                    <CardSkeleton key={index} />
-                  ))}
-                </div>
-              </div>
+            {productsError ? (
+              <ErrorState 
+                title="Failed to Load Products" 
+                message={productsError} 
+                onRetry={() => getProducts(1)} 
+              />
+            ) : (isLoading || loadingProducts) && filterProduct.length === 0 ? (
+              <LoadingState type="card" count={8} message="Discovering amazing items for you..." />
             ) : filterProduct.length > 0 ? (
               <>
                 <p className="sr-only" role="status" aria-live="polite">
@@ -552,23 +556,13 @@ function Collections() {
                 )}
               </>
             ) : (
-              <div className="text-center py-16 bg-white/80 dark:bg-gray-800/30 rounded-2xl border border-slate-200 dark:border-gray-700/40">
-                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-slate-200 to-slate-300 dark:from-gray-800 dark:to-gray-900 rounded-full flex items-center justify-center">
-                  <FaSearch className="text-slate-500 dark:text-gray-600 text-3xl" />
-                </div>
-                <h3 className="text-slate-900 dark:text-white text-xl font-semibold mb-2">
-                  No products found
-                </h3>
-                <p className="text-slate-600 dark:text-gray-400 mb-6">
-                  Try adjusting your filters to find what you're looking for.
-                </p>
-                <button
-                  onClick={clearAllFilters}
-                  className="px-6 py-2.5 bg-cyan-500 hover:bg-cyan-600 text-white rounded-full transition-colors"
-                >
-                  Clear All Filters
-                </button>
-              </div>
+              <EmptyState
+                icon={FaSearch}
+                title="No products found"
+                description="Try adjusting your filters to find what you're looking for."
+                actionText="Clear All Filters"
+                onAction={clearAllFilters}
+              />
             )}
           </div>
         </div>

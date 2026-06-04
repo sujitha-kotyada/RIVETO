@@ -1,12 +1,15 @@
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { shopDataContext } from '../context/ShopContext';
-
-
 import { toast } from 'react-toastify';
+import CartTotal from '../components/CartTotal';
+import { LoadingState, EmptyState, ErrorState } from '../components/StateComponents';
+import { FaArrowLeft, FaShoppingBasket, FaTruck, FaLock, FaShieldAlt } from 'react-icons/fa';
+import { RiDeleteBin6Line, RiSubtractLine, RiAddLine, RiShoppingBag3Line } from 'react-icons/ri';
+import { MdLocalOffer } from 'react-icons/md';
 
 function Cart() {
-  const { product, currency, cartItem, UpdateQuantity } =
+  const { product, currency, cartItem, UpdateQuantity, loadingCart, cartError, getUserCart } =
     useContext(shopDataContext);
   const [cartData, setCartData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,20 +57,23 @@ function Cart() {
     return (price * quantity).toFixed(2);
   };
 
-  if (isLoading) {
+  if (cartError) {
     return (
-      <div className="min-h-screen bg-[#0b1220] flex items-center justify-center pt-20">
-        <div
-          className="text-center"
-          role="status"
-          aria-live="polite"
-          aria-busy="true"
-        >
-          <div
-            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-            aria-hidden="true"
-          ></div>
-          <p className="text-gray-400">Loading your cart...</p>
+      <div className="min-h-screen bg-[#0b1220] flex items-center justify-center pt-24 px-4">
+        <ErrorState 
+          title="Failed to Load Cart" 
+          message={cartError} 
+          onRetry={getUserCart} 
+        />
+      </div>
+    );
+  }
+
+  if (isLoading || loadingCart) {
+    return (
+      <div className="min-h-screen bg-[#0b1220] pt-28 pb-20 px-4 md:px-10">
+        <div className="max-w-7xl mx-auto">
+          <LoadingState type="list" count={3} message="Loading your cart..." />
         </div>
       </div>
     );
@@ -106,27 +112,13 @@ function Cart() {
           {/* Cart Items */}
           <div className="lg:col-span-2">
             {cartData.length === 0 ? (
-              <div
-                className="text-center py-20 bg-[#0f172a] border border-[#1f2a44] rounded-lg"
-                role="status"
-              >
-                <div className="w-20 h-20 mx-auto mb-6 bg-[#111c33] border border-[#1f2a44] rounded-full flex items-center justify-center">
-                  <FaShoppingBasket className="text-gray-500 text-3xl" />
-                </div>
-                <h3 className="text-slate-900 dark:text-white text-xl font-semibold mb-2">
-                  Your cart is empty
-                </h3>
-                <p className="text-slate-600 dark:text-gray-400 mb-6">
-                  Looks like you haven't added anything to your cart yet
-                </p>
-                <button
-                  type="button"
-                  onClick={() => navigate('/collection')}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
-                >
-                  Start Shopping
-                </button>
-              </div>
+              <EmptyState
+                icon={FaShoppingBasket}
+                title="Your cart is empty"
+                description="Looks like you haven't added anything to your cart yet. Let's find some awesome gear!"
+                actionText="Start Shopping"
+                onAction={() => navigate('/collection')}
+              />
             ) : (
               <ul className="space-y-4" aria-label="Cart items">
                 {cartData.map((item, index) => {

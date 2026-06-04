@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import apiConfig from '../utils/apiConfig';
+import { LoadingState, EmptyState, ErrorState } from './StateComponents';
 
 const STACK_OPTIONS = [
   'React',
@@ -24,6 +25,7 @@ export default function IssueRecommendations() {
   const [level, setLevel] = useState('all');
   const [stack, setStack] = useState([]);
   const [history, setHistory] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
 
   const toggleStack = (tech) => {
     setStack((prev) =>
@@ -74,7 +76,7 @@ export default function IssueRecommendations() {
     fetchIssues();
 
     return () => controller.abort();
-  }, [queryParams]);
+  }, [queryParams, retryCount]);
 
   const difficultyColor = (label) => {
     if (label === 'Easy')
@@ -169,13 +171,26 @@ export default function IssueRecommendations() {
         </div>
 
         {loading && (
-          <p className="text-sm text-slate-500">Loading recommendations...</p>
+          <div className="py-10">
+            <LoadingState message="Finding recommended issues..." />
+          </div>
         )}
-        {error && <p className="text-sm font-medium text-rose-600">{error}</p>}
+        {error && (
+          <div className="py-10">
+            <ErrorState 
+              title="Failed to load recommendations" 
+              message={error} 
+              onRetry={() => setRetryCount((prev) => prev + 1)} 
+            />
+          </div>
+        )}
         {!loading && issues.length === 0 && !error && (
-          <p className="text-sm text-slate-500">
-            No issues found. Try different filters.
-          </p>
+          <div className="py-10">
+            <EmptyState
+              title="No recommendations found"
+              description="Try adjusting your filters or keywords to find matching issues."
+            />
+          </div>
         )}
 
         <div className="mt-6 grid gap-4">

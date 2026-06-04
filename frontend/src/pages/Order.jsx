@@ -1,7 +1,10 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 import { shopDataContext } from '../context/ShopContext';
 import apiConfig from '../utils/apiConfig';
-import { FaBox, FaShoppingBag, FaShippingFast, FaCheckCircle, FaClock, FaMapMarkerAlt, FaUndo } from 'react-icons/fa';
+import { FaBox, FaShoppingBag, FaShippingFast, FaCheckCircle, FaClock, FaMapMarkerAlt, FaUndo, FaCalendarAlt } from 'react-icons/fa';
+import { GiReceiveMoney } from 'react-icons/gi';
+import Title from '../components/Title';
+import { LoadingState, EmptyState, ErrorState } from '../components/StateComponents';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -10,6 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 function Order() {
   const [orderData, setOrderData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const { currency } = useContext(shopDataContext);
   const sectionRef = useRef(null);
@@ -17,6 +21,7 @@ function Order() {
   const loadOrderData = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const result = await apiConfig.post('/order/userorder', {});
 
       if (result.data) {
@@ -37,6 +42,7 @@ function Order() {
       }
     } catch (error) {
       console.log('Error loading orders:', error);
+      setError(error.response?.data?.message || error.message || 'Failed to load orders.');
     } finally {
       setIsLoading(false);
     }
@@ -151,14 +157,23 @@ function Order() {
     });
   };
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-sky-100 dark:from-gray-900 dark:via-[#0f172a] dark:to-[#0c4a6e] flex items-center justify-center pt-24 px-4">
+        <ErrorState 
+          title="Failed to Load Orders" 
+          message={error} 
+          onRetry={loadOrderData} 
+        />
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-sky-100 dark:from-gray-900 dark:via-[#0f172a] dark:to-[#0c4a6e] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-cyan-700 dark:text-cyan-200 text-lg">
-            Loading your orders...
-          </p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-sky-100 dark:from-gray-900 dark:via-[#0f172a] dark:to-[#0c4a6e] pt-28 pb-20 px-4 md:px-10">
+        <div className="max-w-6xl mx-auto">
+          <LoadingState type="list" count={3} message="Loading your orders..." />
         </div>
       </div>
     );
@@ -252,20 +267,16 @@ function Order() {
         {/* Orders List */}
         <div className="space-y-6">
           {filteredOrders.length === 0 ? (
-            <div className="text-center py-16 bg-white/80 dark:bg-gray-800/30 rounded-2xl border border-slate-200 dark:border-gray-700/40">
-              <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-slate-200 to-slate-300 dark:from-gray-800 dark:to-gray-900 rounded-full flex items-center justify-center">
-                <FaShoppingBag className="text-slate-500 dark:text-gray-600 text-3xl" />
-              </div>
-              <h3 className="text-slate-900 dark:text-white text-xl font-semibold mb-2">
-                No orders found
-              </h3>
-              <p className="text-slate-600 dark:text-gray-400">
-                You haven't placed any orders yet.
-              </p>
-              <button className="mt-6 px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl transition-colors">
-                Start Shopping
-              </button>
-            </div>
+            <EmptyState
+              icon={FaShoppingBag}
+              title="No orders found"
+              description="Looks like you haven't placed any orders yet. Ready to grab some items?"
+              actionText="Start Shopping"
+              onAction={() => {
+                // Navigate to collections
+                window.location.href = '/collection';
+              }}
+            />
           ) : (
             filteredOrders.map((item, index) => {
               const _StatusIcon = getStatusIcon(item.status);

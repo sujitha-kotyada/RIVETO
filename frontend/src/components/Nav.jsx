@@ -8,15 +8,14 @@ import {
 
 import { useFocusTrap, useEscapeKey } from '../hooks/useDialogA11y';
 
-
 import { IoMdHome } from 'react-icons/io';
-
-import {
-  HiOutlineCollection
-} from 'react-icons/hi';
-
+import { HiOutlineCollection } from 'react-icons/hi';
 import { RiContactsLine } from 'react-icons/ri';
-
+import { BsSearch, BsSun, BsMoon, BsBoxSeam } from 'react-icons/bs';
+import { FaUserCircle, FaHeart } from 'react-icons/fa';
+import { MdOutlineShoppingCart, MdLogout } from 'react-icons/md';
+import { FiLogIn, FiInfo } from 'react-icons/fi';
+import { IoSearchCircleOutline } from 'react-icons/io5';
 
 import { useNavigate, useLocation } from 'react-router-dom';
 
