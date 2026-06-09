@@ -20,12 +20,12 @@ function ShopContext({ children }) {
 
   const { userData } = useContext(userDataContext); //
   const [wishlist, setWishlist] = useState([]);
+  const [loadingWishlist, setLoadingWishlist] = useState(false);
+  const [wishlistError, setWishlistError] = useState(null);
 
   const currency = '₹';
   const delivery_fee = 40;
   //wishlist functions
-  const fetchWishlist = async () => {
-
   const fetchWishlist = async () => {
     setLoadingWishlist(true);
     setWishlistError(null);
@@ -35,7 +35,6 @@ function ShopContext({ children }) {
         setWishlist(response.data.wishlist);
       }
     } catch (error) {
-      console.log(error);
       // eslint-disable-next-line no-console
       console.error(error);
       setWishlistError(

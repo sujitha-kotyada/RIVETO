@@ -24,8 +24,13 @@ function Add() {
   const { serverUrl } = useContext(authDataContext);
 
   const handleAddProduct = async (e) => {
-    setLoading(true);
     e.preventDefault();
+    setLoading(true);
+    if (!image1) {
+      toast.error("Please upload the first product image.");
+      setLoading(false);
+      return;
+    }
     try {
       let formData = new FormData();
       formData.append("image1", image1);
@@ -130,7 +135,7 @@ function Add() {
                       type="file"
                       id={`image${i + 1}`}
                       hidden
-                      required={i === 0} // Only first image is required
+                      required={false}
                       onChange={(e) => {
                         const file = e.target.files[0];
                         if (i === 0) setImage1(file);

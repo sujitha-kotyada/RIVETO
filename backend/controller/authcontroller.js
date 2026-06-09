@@ -6,6 +6,7 @@ import { sendMail } from "../config/sendEmail.js";
 import generateOTP from "../utils/otp.js";
 import TempUser from "../model/tempUserModel.js";
 import { otpTemplate } from "../utils/otpTemplet.js";
+import { sendNotification } from "../services/notificationService.js";
 
 export const sendOTP = async (req, res) => {
   try {
@@ -86,6 +87,13 @@ export const verifyOTP = async (req, res) => {
     });
 
     await TempUser.deleteOne({ email });
+
+    sendNotification({
+      isAdmin: true,
+      title: "New User Registered",
+      message: `${user.name} (${user.email}) has signed up.`,
+      type: "new_user",
+    });
 
     const token = genToken(user._id);
 

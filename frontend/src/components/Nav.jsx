@@ -7,7 +7,7 @@ import { IoMdHome } from 'react-icons/io';
 import { HiOutlineCollection } from 'react-icons/hi';
 
 import { RiContactsLine } from 'react-icons/ri';
-import { BsSearch, BsSun, BsMoon, BsBoxSeam } from 'react-icons/bs';
+import { BsSearch, BsSun, BsMoon, BsBoxSeam, BsBell } from 'react-icons/bs';
 import { FaUserCircle, FaHeart } from 'react-icons/fa';
 import { MdOutlineShoppingCart, MdLogout } from 'react-icons/md';
 import { FiLogIn, FiInfo } from 'react-icons/fi';
@@ -20,6 +20,7 @@ import apiConfig from '../utils/apiConfig';
 import { userDataContext } from '../context/UserContext';
 import { shopDataContext } from '../context/ShopContext';
 import { ThemeContext } from '../context/ThemeContext';
+import { notificationContext } from '../context/NotificationContext';
 
 import gsap from 'gsap';
 
@@ -30,9 +31,13 @@ function Nav() {
     useContext(shopDataContext);
 
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useContext(notificationContext);
 
   const [showProfile, setShowProfile] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const notificationsRef = useRef(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,6 +67,21 @@ function Nav() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  // Notifications click outside listener
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+    if (showNotifications) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showNotifications]);
 
   // Initial animations
   useEffect(() => {
@@ -257,6 +277,86 @@ function Nav() {
                 <BsMoon className="text-gray-700 text-lg" />
               )}
             </button>
+
+            {/* NOTIFICATIONS */}
+            {userData && (
+              <div className="relative" ref={notificationsRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
+                  aria-label="Notifications menu"
+                >
+                  <BsBell className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {showNotifications && (
+                  <div
+                    className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#111c33] shadow-2xl rounded-xl border border-gray-200 dark:border-[#1f2a44] z-50 overflow-hidden"
+                  >
+                    <div className="px-4 py-3 border-b border-gray-200 dark:border-[#1f2a44] flex items-center justify-between bg-gray-50 dark:bg-[#0f172a]">
+                      <span className="font-semibold text-sm text-gray-900 dark:text-white">Notifications</span>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={markAllAsRead}
+                          className="text-xs font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          Mark all as read
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-64 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-800">
+                      {notifications.length === 0 ? (
+                        <div className="p-4 text-center text-xs text-gray-500 dark:text-gray-400">
+                          No notifications yet
+                        </div>
+                      ) : (
+                        notifications.slice(0, 5).map((n) => (
+                          <div
+                            key={n._id}
+                            className={`p-3 transition-colors ${
+                              n.read ? "bg-transparent" : "bg-blue-50/40 dark:bg-blue-900/10"
+                            } hover:bg-gray-50 dark:hover:bg-[#1a2332]`}
+                          >
+                            <div className="flex justify-between items-start gap-2">
+                              <span className={`text-xs font-bold ${n.read ? "text-gray-700 dark:text-gray-300" : "text-blue-600 dark:text-blue-400"}`}>
+                                {n.title}
+                              </span>
+                              {!n.read && (
+                                <button
+                                  onClick={() => markAsRead(n._id)}
+                                  className="text-[10px] text-blue-600 hover:underline dark:text-blue-400"
+                                >
+                                  Mark read
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{n.message}</p>
+                            <span className="text-[10px] text-gray-400 mt-1 block">
+                              {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    <button
+                      onClick={() => {
+                        navigate("/notifications");
+                        setShowNotifications(false);
+                      }}
+                      className="w-full text-center py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a2332] border-t border-gray-100 dark:border-gray-800"
+                    >
+                      View all notifications
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* PROFILE */}
             <button

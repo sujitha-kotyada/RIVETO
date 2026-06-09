@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Review from "../model/reviewModel.js";
 import Product from "../model/productModel.js";
 import User from "../model/userModel.js";
+import { sendNotification } from "../services/notificationService.js";
 
 async function recalculateProductRating(productId) {
   const result = await Review.aggregate([
@@ -73,6 +74,13 @@ export const addReview = async (req, res) => {
     });
 
     await newReview.save();
+
+    sendNotification({
+      isAdmin: true,
+      title: "New Product Review",
+      message: `${user.name} reviewed "${product.name}" with a ${rating}-star rating.`,
+      type: "new_review",
+    });
 
     const { avgRating, reviewCount } = await recalculateProductRating(productId);
 

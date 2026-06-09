@@ -8,6 +8,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import fs from "fs";
 import botRoute from "./routes/bot.js";
+import { createServer } from "http";
+import { initSocket } from "./services/notificationService.js";
+import notificationRouter from "./routes/notificationRoutes.js";
 
 import connectdb from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -20,6 +23,8 @@ import wishlistRouter from "./routes/wishlistRoutes.js";
 import recommendationsRoute from "./routes/recommendations.js";
 
 const app = express();
+const server = createServer(app);
+initSocket(server);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 const PORT = process.env.PORT || 3000;
 
@@ -53,6 +58,7 @@ app.use("/api/order", orderRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/wishlist", wishlistRouter);
 app.use("/api/recommendations", recommendationsRoute);
+app.use("/api/notifications", notificationRouter);
 app.use("/api", botRoute);
 
 app.get("/", (req, res) => res.send("Backend is running!"));
@@ -68,6 +74,6 @@ if (fs.existsSync(frontendBuildPath)) {
   });
 }
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
