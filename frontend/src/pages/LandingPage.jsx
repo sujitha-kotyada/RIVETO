@@ -1166,13 +1166,13 @@ function LandingPage() {
           <div className="pt-8 border-t border-gray-200/50 dark:border-gray-700/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500 dark:text-gray-400">
             <p>© {new Date().getFullYear()} Riveto. All rights reserved.</p>
             <div className="flex items-center gap-6">
-              <button
-                type="button"
-                onClick={() => navigate('/privacy')}
-                className="hover:text-cyan-300 transition-all duration-300 underline-offset-4 hover:underline"
-              >
-                Privacy
-              </button>
+                      <button
+            type="button"
+            onClick={() => navigate('/privacy-policy')}
+            className="hover:text-cyan-300 transition-all duration-300 underline-offset-4 hover:underline"
+          >
+            Privacy
+          </button>
               <button
                 type="button"
                 onClick={() => navigate('/terms')}
