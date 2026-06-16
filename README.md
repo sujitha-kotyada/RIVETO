@@ -1,6 +1,5 @@
 # RIVETO
-
-[![License](https://img.shields.io/github/license/Nsanjayboruds/RIVETO)](LICENSE)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Issues](https://img.shields.io/github/issues/Nsanjayboruds/RIVETO)](https://github.com/Nsanjayboruds/RIVETO/issues)
 [![Stars](https://img.shields.io/github/stars/Nsanjayboruds/RIVETO)](https://github.com/Nsanjayboruds/RIVETO/stargazers)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/11234/badge)](https://www.bestpractices.dev/projects/11234)
