@@ -8,7 +8,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FaChevronLeft, FaChevronRight, FaHeart, FaShare, FaShoppingCart, FaStar } from 'react-icons/fa';
 import RelatedProduct from '../components/RelatedProduct';
 
-
 function ProductDetail() {
   const { userData } = useContext(userDataContext);
   const { productId } = useParams();
@@ -120,16 +119,17 @@ function ProductDetail() {
   };
 
   const handleAddToWishlist = () => {
-  if (!productData?._id) return;
+    if (!productData?._id) return;
 
-  if (isWishlisted) {
-    removeFromWishlist(productData._id);
-    toast.info('Removed from wishlist');
-  } else {
-    addToWishlist(productData._id);
-    toast.success('Added to wishlist 💖');
-  }
-};
+    if (isWishlisted) {
+      removeFromWishlist(productData._id);
+      toast.info('Removed from wishlist');
+    } else {
+      addToWishlist(productData._id);
+      toast.success('Added to wishlist 💖');
+    }
+  };
+
   // share
   const handleShare = async () => {
     if (navigator.share) {
@@ -460,16 +460,16 @@ function ProductDetail() {
 
             <div className="flex gap-3">
               <button
-  onClick={handleAddToWishlist}
-  className={`flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200
-    ${isWishlisted
-      ? 'bg-rose-600 text-white'
-      : 'bg-gray-800 text-white hover:bg-gray-700'
-    }`}
->
-  <FaHeart className={isWishlisted ? 'text-white' : ''} />
-  {isWishlisted ? 'Wishlisted' : 'Wishlist'}
-</button>
+                onClick={handleAddToWishlist}
+                className={`flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200
+                  ${isWishlisted
+                    ? 'bg-rose-600 text-white'
+                    : 'bg-gray-800 text-white hover:bg-gray-700'
+                  }`}
+              >
+                <FaHeart className={isWishlisted ? 'text-white' : ''} />
+                {isWishlisted ? 'Wishlisted' : 'Wishlist'}
+              </button>
               <button
                 type="button"
                 onClick={handleShare}
@@ -559,10 +559,23 @@ function ProductDetail() {
                         Edit Review
                       </button>
                     </div>
-                    <div className="flex gap-1 mb-2" aria-hidden="true">
+                    <div className="flex items-center gap-1 mb-2" aria-hidden="true">
                       {[...Array(userReview.rating)].map((_, i) => (
                         <FaStar key={i} className="text-yellow-400" />
                       ))}
+                      
+                      {/* Integrated Sentiment Badge for Current User's Review */}
+                      {userReview.sentimentLabel === 'Positive' && (
+                        <span className="ml-3 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                          Helpful Positive
+                        </span>
+                      )}
+                      {userReview.sentimentLabel === 'Negative' && (
+                        <span className="ml-3 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800">
+                          Critical Review
+                        </span>
+                      )}
+
                     </div>
                     <p className="text-slate-700 dark:text-gray-300">
                       {userReview.comment}
@@ -651,9 +664,24 @@ function ProductDetail() {
                             <FaStar key={i} className="text-yellow-400" />
                           ))}
                         </div>
-                        <span className="text-cyan-400 font-semibold">
-                          {review.name}
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-cyan-400 font-semibold">
+                            {review.name}
+                          </span>
+                          
+                          {/* Integrated Sentiment Badge for the General Review List */}
+                          {review.sentimentLabel === 'Positive' && (
+                            <span className="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                              Helpful Positive
+                            </span>
+                          )}
+                          {review.sentimentLabel === 'Negative' && (
+                            <span className="px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800">
+                              Critical Review
+                            </span>
+                          )}
+
+                        </div>
                       </div>
                       <p className="text-slate-700 dark:text-gray-300">
                         {review.comment}

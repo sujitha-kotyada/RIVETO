@@ -30,6 +30,18 @@ const reviewSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // Add this inside the reviewSchema definition
+sentimentScore: {
+    type: Number,
+    required: false,
+    default: 0 // Scores usually range from negative to positive numbers
+},
+sentimentLabel: {
+    type: String,
+    enum: ['Positive', 'Neutral', 'Negative'],
+    default: 'Neutral'
+}
+    
   },
   {
     timestamps: true,
