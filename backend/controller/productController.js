@@ -1,5 +1,6 @@
 import uploadOnCloudinary from "../config/Cloudinary.js";
 import Product from "../model/productModel.js";
+import { emitActivity } from "../services/notificationService.js";
 
 const safeUpload = async (fileArray) => {
   const filePath = fileArray?.[0]?.path;
@@ -93,6 +94,15 @@ export const addProduct = async (req, res) => {
     };
 
     const createdProduct = await Product.create(productData);
+
+    emitActivity({
+      type: "product_added",
+      user: {
+        name: "Admin",
+      },
+      action: `Added product "${createdProduct.name}"`,
+    });
+
     return res.status(201).json(createdProduct);
   } catch (error) {
     console.error("❌ Error in addProduct:", error);
@@ -136,6 +146,17 @@ export const removeProduct = async (req, res) => {
   try {
     let { id } = req.params;
     const product = await Product.findByIdAndDelete(id);
+
+    if (product) {
+      emitActivity({
+        type: "product_deleted",
+        user: {
+          name: "Admin",
+        },
+        action: `Deleted product "${product.name}"`,
+      });
+    }
+
     return res
       .status(200)
       .json({ message: "Product deleted successfully", product });
