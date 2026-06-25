@@ -39,6 +39,7 @@ import NotFound from './pages/NotFound';
 import LandingPage from './pages/LandingPage';
 import Ai from './components/Ai';
 import ComparisonPanel from './components/ComparisonPanel';
+import ScrollProgressBar from "./components/ScrollProgressBar";
 
 function App() {
   const { userData } = useContext(userDataContext);
@@ -58,6 +59,7 @@ function App() {
 
   return (
     <>
+      <ScrollProgressBar />
       <ToastContainer position="top-center" autoClose={2000} />
       {shouldShowNav && <Nav />}
 
