@@ -122,6 +122,11 @@ export const login = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
+    if (!user.password) {
+      return res.status(400).json({
+        message: "Please continue with Google or reset your password",
+      });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
@@ -147,7 +152,7 @@ export const googleLogin = async (req, res) => {
 
     let user = await User.findOne({ email });
     if (!user) {
-      user = await User.create({ name, email });
+      user = await User.create({ name, email, authProvider: "google" });
     }
 
     const token = genToken(user._id);
