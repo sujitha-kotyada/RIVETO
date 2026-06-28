@@ -37,6 +37,7 @@ import Contributors from './pages/Contributors';
 import Notifications from './pages/Notifications';
 import NotFound from './pages/NotFound';
 import LandingPage from './pages/LandingPage';
+import SavedAddresses from './pages/SavedAddresses';
 import Ai from './components/Ai';
 import ComparisonPanel from './components/ComparisonPanel';
 import ScrollProgressBar from "./components/ScrollProgressBar";
@@ -235,6 +236,17 @@ function App() {
               <Order />
             ) : (
               <Navigate to="/login" state={{ from: location.pathname }} />
+            )
+          }
+        />
+
+        <Route
+          path="/saved-addresses"
+          element={
+            userData ? (
+              <SavedAddresses />
+            ) : (
+              <Navigate to="/login" state={{ from: '/saved-addresses' }} />
             )
           }
         />

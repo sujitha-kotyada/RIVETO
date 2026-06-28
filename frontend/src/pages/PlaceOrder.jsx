@@ -29,6 +29,10 @@ function PlaceOrder() {
   const [formErrors, setFormErrors] = useState({});
   const navigate = useNavigate();
 
+  // Saved addresses
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+
   const {
     cartItem,
     setCartItem,
@@ -51,6 +55,29 @@ function PlaceOrder() {
   });
 
   useEffect(() => {
+    // Fetch saved addresses
+    apiConfig.get('/user/address').then((res) => {
+      setSavedAddresses(res.data);
+      // Pre-select the default address if one exists
+      const def = res.data.find((a) => a.isDefault);
+      if (def) {
+        setSelectedAddressId(def._id);
+        setFormData({
+          firstname: def.fullName.split(' ')[0] || '',
+          lastname: def.fullName.split(' ').slice(1).join(' ') || '',
+          email: userData?.email || '',
+          street: def.street,
+          city: def.city,
+          state: def.state,
+          pincode: def.pincode,
+          country: def.country,
+          phone: def.phone,
+        });
+      }
+    }).catch(() => {
+      // Non-critical — user can still enter address manually
+    });
+
     // Animations
     gsap.fromTo(
       '.form-section',
@@ -69,7 +96,23 @@ function PlaceOrder() {
       { opacity: 0, y: 30 },
       { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: 'back.out(1.7)' }
     );
-  }, []);
+  }, [userData]);
+
+  const onSelectSavedAddress = (address) => {
+    setSelectedAddressId(address._id);
+    setFormData({
+      firstname: address.fullName.split(' ')[0] || '',
+      lastname: address.fullName.split(' ').slice(1).join(' ') || '',
+      email: userData?.email || '',
+      street: address.street,
+      city: address.city,
+      state: address.state,
+      pincode: address.pincode,
+      country: address.country,
+      phone: address.phone,
+    });
+    setFormErrors({});
+  };
 
   const validateForm = () => {
     const errors = {};
@@ -190,6 +233,57 @@ function PlaceOrder() {
               </div>
 
               <form onSubmit={onSubmitHandler} className="space-y-6">
+                {/* Saved Addresses Selector */}
+                {savedAddresses.length > 0 && (
+                  <div className="mb-2">
+                    <p className="text-gray-300 text-sm font-medium mb-3 flex items-center gap-2">
+                      <FaCheckCircle className="text-cyan-400" />
+                      Select a saved address
+                    </p>
+                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                      {savedAddresses.map((address) => (
+                        <div
+                          key={address._id}
+                          onClick={() => onSelectSavedAddress(address)}
+                          className={`cursor-pointer p-3 rounded-xl border transition-all ${
+                            selectedAddressId === address._id
+                              ? 'border-cyan-500 bg-cyan-500/10'
+                              : 'border-gray-600 hover:border-gray-500 bg-gray-700/30'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-4 h-4 rounded-full border-2 shrink-0 ${
+                                selectedAddressId === address._id
+                                  ? 'bg-cyan-500 border-cyan-500'
+                                  : 'border-gray-500'
+                              }`}
+                            />
+                            <div>
+                              <p className="text-white text-sm font-medium">
+                                {address.fullName}
+                                {address.isDefault && (
+                                  <span className="ml-2 text-xs text-cyan-400">(Default)</span>
+                                )}
+                              </p>
+                              <p className="text-gray-400 text-xs">
+                                {address.street}, {address.city}, {address.state} — {address.pincode}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="relative my-5">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-600" />
+                      </div>
+                      <div className="relative flex justify-center text-xs">
+                        <span className="bg-gray-800 px-3 text-gray-400">or fill in manually</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-gray-300 text-sm mb-2">

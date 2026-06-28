@@ -8,7 +8,7 @@ import { HiOutlineCollection } from 'react-icons/hi';
 
 import { RiContactsLine } from 'react-icons/ri';
 import { BsSearch, BsSun, BsMoon, BsBoxSeam, BsBell } from 'react-icons/bs';
-import { FaUserCircle, FaHeart } from 'react-icons/fa';
+import { FaUserCircle, FaHeart, FaMapMarkerAlt } from 'react-icons/fa';
 import { MdOutlineShoppingCart, MdLogout } from 'react-icons/md';
 import { FiLogIn, FiInfo } from 'react-icons/fi';
 import { IoSearchCircleOutline } from 'react-icons/io5';
@@ -513,6 +513,29 @@ function Nav() {
 
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         Your saved products
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* SAVED ADDRESSES */}
+                  <button
+                    className="w-full px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#1a2332] flex items-center gap-3 transition-all"
+                    onClick={() => {
+                      navigate('/saved-addresses');
+                      setShowProfile(false);
+                    }}
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
+                      <FaMapMarkerAlt className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    </div>
+
+                    <div className="text-left">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        Saved Addresses
+                      </p>
+
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Manage delivery addresses
                       </p>
                     </div>
                   </button>
