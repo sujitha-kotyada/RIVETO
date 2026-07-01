@@ -39,6 +39,7 @@ function PlaceOrder() {
     getCartAmount,
     delivery_fee,
     product: products,
+    currency,
   } = useContext(shopDataContext);
   const { userData } = useContext(userDataContext);
 
@@ -584,7 +585,7 @@ function PlaceOrder() {
               <div className="text-center">
                 <p className="text-gray-400 text-sm flex items-center justify-center gap-2">
                   <FaShippingFast className="w-4 h-4" />
-                  Free shipping on orders over $50
+                  Free shipping on orders over {currency}{currency === '₹' ? '1,999' : '50'}
                 </p>
                 <p className="text-gray-400 text-sm mt-1 flex items-center justify-center gap-2">
                   <FaCheckCircle className="w-4 h-4" />
