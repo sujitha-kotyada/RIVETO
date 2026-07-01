@@ -7,7 +7,7 @@ import apiConfig from '../utils/apiConfig';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaChevronLeft, FaChevronRight, FaHeart, FaShare, FaShoppingCart, FaStar } from 'react-icons/fa';
 import RelatedProduct from '../components/RelatedProduct';
-
+import { recordGuestView } from '../utils/guestViewHistory';
 
 function ProductDetail() {
   const { userData } = useContext(userDataContext);
@@ -108,6 +108,26 @@ function ProductDetail() {
 
     fetchReviews();
   }, [productId, product, fetchReviews]);
+
+  // Log a "viewed" event for Recently Viewed / Picks For You. Debounced so a
+  // quick refresh or back-and-forth navigation doesn't spam duplicate entries.
+  useEffect(() => {
+    if (!productId) return;
+
+    const timer = setTimeout(() => {
+      if (userData) {
+        apiConfig
+          .post('/user/recently-viewed', { productId }, { skipGlobalErrorToast: true })
+          .catch(() => {
+            // Non-critical — failing to log a view shouldn't disrupt browsing.
+          });
+      } else {
+        recordGuestView(productId);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [productId, userData]);
 
   const handleAddToCart = () => {
     if (!size) {

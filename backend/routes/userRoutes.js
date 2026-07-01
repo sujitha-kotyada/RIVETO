@@ -12,11 +12,27 @@ import adminAuth from "../middleware/adminAuth.js";
 import { userRateLimiter, adminRateLimiter } from "../middleware/rateLimiters.js";
 import validateRequest from "../middleware/validateRequest.js";
 import { addressSchema } from "../validators/authSchemas.js";
+import {
+  logView,
+  getRecentlyViewed,
+  clearViewHistory,
+  removeViewedItem,
+  getPicksForYou,
+  dismissPick,
+} from "../controller/viewHistoryController.js";
 
 let userRoutes = express.Router();
 
 userRoutes.get("/getCurrentUser", isAuth, userRateLimiter, getCurrentUser);
 userRoutes.get("/getadmin", adminAuth, adminRateLimiter, getAdmin);
+
+// Recently Viewed + Picks For You — all protected by isAuth
+userRoutes.post("/recently-viewed", isAuth, userRateLimiter, logView);
+userRoutes.get("/recently-viewed", isAuth, userRateLimiter, getRecentlyViewed);
+userRoutes.delete("/recently-viewed", isAuth, userRateLimiter, clearViewHistory);
+userRoutes.delete("/recently-viewed/:productId", isAuth, userRateLimiter, removeViewedItem);
+userRoutes.get("/picks-for-you", isAuth, userRateLimiter, getPicksForYou);
+userRoutes.delete("/picks-for-you/:productId", isAuth, userRateLimiter, dismissPick);
 
 // Address routes — all protected by isAuth
 userRoutes.get("/address", isAuth, userRateLimiter, getAddresses);
