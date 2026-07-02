@@ -1,6 +1,10 @@
 import Order from "../model/orderModel.js"; // ✅ Keep this
 import User from "../model/userModel.js"; // ✅ Keep this
-import { sendNotification } from "../services/notificationService.js";
+import {
+  sendNotification,
+  emitActivity,
+} from "../services/notificationService.js";
+
 //for user//
 export const placeOrder = async (req, res) => {
   try {
@@ -29,6 +33,16 @@ export const placeOrder = async (req, res) => {
       title: "New Order Placed",
       message: `${user ? user.name : "A customer"} has placed an order of $${amount}.`,
       type: "order_placed",
+    });
+
+    emitActivity({
+      type: "order_created",
+      user: {
+        id: user?._id,
+        name: user?.name,
+        email: user?.email,
+      },
+      action: `Placed an order of $${amount}`,
     });
 
     return res.status(201).json({ message: "Order Placed" });
@@ -67,11 +81,23 @@ export const updateStatus = async (req, res) => {
     const order = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
 
     if (order) {
+      const user = await User.findById(order.userId);
+
       sendNotification({
         userId: order.userId,
         title: "Order Status Updated",
         message: `Your order status has been updated to "${status}".`,
         type: "order_status_updated",
+      });
+
+      emitActivity({
+        type: "order_status_updated",
+        user: {
+          id: user?._id,
+          name: user?.name,
+          email: user?.email,
+        },
+        action: `Order status changed to "${status}"`,
       });
     }
 

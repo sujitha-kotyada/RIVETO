@@ -1,4 +1,5 @@
 import User from "../model/userModel.js";
+import { emitActivity } from "../services/notificationService.js";
 
 // ✅ Add to cart
 export const addToCart = async (req, res) => {
@@ -19,6 +20,17 @@ export const addToCart = async (req, res) => {
     cartData[itemId][size] = (cartData[itemId][size] || 0) + 1;
 
     await User.findByIdAndUpdate(userId, { cartData });
+
+    emitActivity({
+      type: "cart_added",
+      user: {
+        id: userData._id,
+        name: userData.name,
+        email: userData.email,
+      },
+      action: `Added item ${itemId} (size ${size}) to cart`,
+    });
+
     return res.status(201).json({ message: "Added to cart" });
   } catch (error) {
     console.log("addToCart error:", error);
@@ -37,6 +49,17 @@ export const updateCart = async (req, res) => {
     cartData[itemId][size] = quantity;
 
     await User.findByIdAndUpdate(req.userId, { cartData });
+
+    emitActivity({
+      type: "cart_updated",
+      user: {
+        id: userData._id,
+        name: userData.name,
+        email: userData.email,
+      },
+      action: `Updated quantity of item ${itemId} (${size}) to ${quantity}`,
+    });
+
     return res.status(201).json({ message: "Cart updated" });
   } catch (error) {
     console.log("updateCart error:", error);

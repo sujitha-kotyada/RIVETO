@@ -1,4 +1,5 @@
 import User from "../model/userModel.js";
+import { emitActivity } from "../services/notificationService.js";
 
 
 // add product
@@ -13,6 +14,16 @@ export const addToWishlist = async (req, res) => {
     if (!user.wishlist.includes(productId)) {
       user.wishlist.push(productId);
       await user.save();
+
+      emitActivity({
+        type: "wishlist_added",
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+        },
+        action: `Added product ${productId} to wishlist`,
+      });
     }
 
     await user.populate('wishlist');
@@ -49,6 +60,16 @@ export const removeFromWishlist = async (req, res) => {
     );
 
     await user.save();
+
+    emitActivity({
+      type: "wishlist_removed",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      action: `Removed product ${productId} from wishlist`,
+    });
 
     await user.populate('wishlist');
 

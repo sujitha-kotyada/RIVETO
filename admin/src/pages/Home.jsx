@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { io } from "socket.io-client";
 import Nav from "../components/Nav";
 import Sidebar from "../components/Sidebar";
 import { authDataContext } from "../Context/AuthProvider";
@@ -14,6 +15,7 @@ function Home() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [activities, setActivities] = useState([]);
   const { serverUrl } = useContext(authDataContext);
 
   const fetchCounts = async () => {
@@ -22,7 +24,7 @@ function Home() {
       const productRes = await axios.get(`${serverUrl}/api/product/list`, {
         withCredentials: true,
       });
-      setTotalProducts(productRes.data.length);
+      setTotalProducts(productRes.data.products.length);
 
       const orderRes = await axios.post(
         `${serverUrl}/api/order/list`,
@@ -39,7 +41,22 @@ function Home() {
 
   useEffect(() => {
     fetchCounts();
-  }, []);
+
+    const socket = io(serverUrl, {
+      withCredentials: true,
+    });
+
+    socket.on("userActivity", (activity) => {
+      setActivities((prev) => [
+        activity,
+        ...prev,
+      ].slice(0, 10));
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [serverUrl]);
 
   // Format numbers with commas
   const formatNumber = (num) => {
@@ -144,27 +161,44 @@ function Home() {
               Recent Activity
             </h3>
             <div className="space-y-3">
-              <div className="flex items-center space-x-3 p-3 hover:bg-gray-800/30 rounded-lg transition-colors">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <p className="text-sm text-gray-300">
-                  New order #ORD-2871 received
+              {activities.length === 0 ? (
+                <p className="text-gray-400 text-sm">
+                  Waiting for user activity...
                 </p>
-                <span className="text-xs text-gray-500 ml-auto">2m ago</span>
-              </div>
-              <div className="flex items-center space-x-3 p-3 hover:bg-gray-800/30 rounded-lg transition-colors">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                <p className="text-sm text-gray-300">
-                  Product "Wireless Headphones" updated
-                </p>
-                <span className="text-xs text-gray-500 ml-auto">15m ago</span>
-              </div>
-              <div className="flex items-center space-x-3 p-3 hover:bg-gray-800/30 rounded-lg transition-colors">
-                <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
-                <p className="text-sm text-gray-300">
-                  Inventory alert: "Smart Watch" low stock
-                </p>
-                <span className="text-xs text-gray-500 ml-auto">1h ago</span>
-              </div>
+              ) : (
+                activities.map((activity, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center space-x-3 p-3 hover:bg-gray-800/30 rounded-lg transition-colors"
+                  >
+                    <div
+  className={`w-2 h-2 rounded-full ${
+    activity.type === "login"
+      ? "bg-green-400"
+      : activity.type === "logout"
+      ? "bg-red-400"
+      : activity.type.includes("order")
+      ? "bg-purple-400"
+      : activity.type.includes("product")
+      ? "bg-blue-400"
+      : activity.type.includes("review")
+      ? "bg-yellow-400"
+      : activity.type.includes("cart")
+      ? "bg-cyan-400"
+      : "bg-pink-400"
+  }`}
+></div>
+
+                    <p className="text-sm text-gray-300">
+                      {activity.user?.name || "User"} — {activity.action}
+                    </p>
+
+                    <span className="text-xs text-gray-500 ml-auto">
+                      {new Date(activity.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
