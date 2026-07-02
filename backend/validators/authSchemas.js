@@ -109,3 +109,52 @@ export const addReviewSchema = Joi.object({
     })
 });
 
+
+export const addressSchema = Joi.object({
+  fullName: Joi.string().min(3).max(60).required().messages({
+    "string.empty": "Full name cannot be empty",
+    "string.min": "Full name must be at least 3 characters",
+    "string.max": "Full name cannot exceed 60 characters",
+    "any.required": "Full name is required",
+  }),
+
+  phone: Joi.string()
+    .pattern(/^[6-9]\d{9}$/)
+    .required()
+    .messages({
+      "string.empty": "Phone number cannot be empty",
+      "string.pattern.base": "Please provide a valid 10-digit Indian phone number",
+      "any.required": "Phone number is required",
+    }),
+
+  street: Joi.string().min(3).max(100).required().messages({
+    "string.empty": "Street address cannot be empty",
+    "string.min": "Street address must be at least 3 characters",
+    "any.required": "Street address is required",
+  }),
+
+  city: Joi.string().min(2).max(50).required().messages({
+    "string.empty": "City cannot be empty",
+    "any.required": "City is required",
+  }),
+
+  state: Joi.string().min(2).max(50).required().messages({
+    "string.empty": "State cannot be empty",
+    "any.required": "State is required",
+  }),
+
+  pincode: Joi.string()
+    .pattern(/^\d{6}$/)
+    .required()
+    .messages({
+      "string.empty": "Pincode cannot be empty",
+      "string.pattern.base": "Pincode must be a valid 6-digit number",
+      "any.required": "Pincode is required",
+    }),
+
+  country: Joi.string().min(2).max(50).default("India").messages({
+    "string.empty": "Country cannot be empty",
+  }),
+
+  isDefault: Joi.boolean().default(false),
+});

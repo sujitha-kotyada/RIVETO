@@ -70,6 +70,21 @@ export const getIO = () => {
   return io;
 };
 
+export const emitActivity = ({
+  type,
+  user,
+  action,
+}) => {
+  if (!io) return;
+
+  io.to("admin").emit("userActivity", {
+    type,
+    user,
+    action,
+    timestamp: new Date(),
+  });
+};
+
 export const sendNotification = async ({ userId = null, isAdmin = false, title, message, type }) => {
   try {
     const notification = await Notification.create({

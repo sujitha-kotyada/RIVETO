@@ -1,5 +1,19 @@
 import mongoose from "mongoose";
 
+const addressSchema = new mongoose.Schema(
+  {
+    fullName: { type: String, required: true },
+    phone: { type: String, required: true },
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    pincode: { type: String, required: true },
+    country: { type: String, required: true, default: "India" },
+    isDefault: { type: Boolean, default: false },
+  },
+  { _id: true }
+);
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -13,9 +27,17 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
 
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return this.authProvider === "local";
+      },
     },
 
     cartData: {
@@ -29,6 +51,12 @@ const userSchema = new mongoose.Schema(
         ref: "Product",
       },
     ],
+
+    addresses: {
+      type: [addressSchema],
+      default: [],
+    },
+
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },

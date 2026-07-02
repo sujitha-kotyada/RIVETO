@@ -403,7 +403,7 @@ function Collections() {
       );
     }
   }, [filterProduct, isLoading]);
-
+ 
   return (
     <>
       <main
@@ -522,6 +522,7 @@ function Collections() {
                         name={item.name}
                         price={item.price}
                         image={item.image1}
+                        reviewCount={item.reviewCount || 0}
                         showQuickActions={true}
                         onCompare={() => toggleCompare(item)}
                         isCompared={compareList?.some(

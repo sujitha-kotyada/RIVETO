@@ -10,6 +10,7 @@ function Card({
   name,
   image,
   id,
+  reviewCount = 0,
   price,
   showQuickActions = true,
   badge,
@@ -129,7 +130,7 @@ function Card({
   };
 
   // Generate stable random values based on product id
-  const { rating, reviewCount, discountPercent, dispatchHours } =
+  const { rating, discountPercent, dispatchHours } =
     useMemo(() => {
       // Use id as seed for deterministic random values
       const seed =
@@ -141,7 +142,7 @@ function Card({
         ((seed * 9301 + offset * 49297) % 233280) / 233280;
       return {
         rating: (pseudoRandom(1) * 1.5 + 3.5).toFixed(1),
-        reviewCount: Math.floor(pseudoRandom(2) * 150) + 45,
+        
         discountPercent: Math.floor(pseudoRandom(3) * 30) + 10,
         dispatchHours: [24, 48, 12][Math.floor(pseudoRandom(4) * 3)],
       };

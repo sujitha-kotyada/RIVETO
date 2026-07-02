@@ -7,7 +7,10 @@ import { sendMail } from "../config/sendEmail.js";
 import generateOTP from "../utils/otp.js";
 import TempUser from "../model/tempUserModel.js";
 import { otpTemplate } from "../utils/otpTemplet.js";
-import { sendNotification } from "../services/notificationService.js";
+import {
+  sendNotification,
+  emitActivity,
+} from "../services/notificationService.js";
 
 export const sendOTP = async (req, res) => {
   try {
@@ -122,6 +125,11 @@ export const login = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
+    if (!user.password) {
+      return res.status(400).json({
+        message: "Please continue with Google or reset your password",
+      });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
@@ -132,6 +140,16 @@ export const login = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    emitActivity({
+      type: "login",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      action: "User logged in",
     });
 
     return res.status(200).json(user);
@@ -147,7 +165,7 @@ export const googleLogin = async (req, res) => {
 
     let user = await User.findOne({ email });
     if (!user) {
-      user = await User.create({ name, email });
+      user = await User.create({ name, email, authProvider: "google" });
     }
 
     const token = genToken(user._id);
@@ -173,6 +191,13 @@ export const logOut = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 0,
     });
+
+    emitActivity({
+      type: "logout",
+      user: {},
+      action: "User logged out",
+    });
+
     return res.status(200).json({ message: "Logged out successfully" });
   } catch (_error) {
     console.log("logout error:", _error);
