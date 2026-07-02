@@ -7,7 +7,10 @@ import { sendMail } from "../config/sendEmail.js";
 import generateOTP from "../utils/otp.js";
 import TempUser from "../model/tempUserModel.js";
 import { otpTemplate } from "../utils/otpTemplet.js";
-import { sendNotification } from "../services/notificationService.js";
+import {
+  sendNotification,
+  emitActivity,
+} from "../services/notificationService.js";
 
 export const sendOTP = async (req, res) => {
   try {
@@ -139,6 +142,16 @@ export const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    emitActivity({
+      type: "login",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      action: "User logged in",
+    });
+
     return res.status(200).json(user);
   } catch (_error) {
     console.log("login error:", _error);
@@ -178,6 +191,13 @@ export const logOut = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 0,
     });
+
+    emitActivity({
+      type: "logout",
+      user: {},
+      action: "User logged out",
+    });
+
     return res.status(200).json({ message: "Logged out successfully" });
   } catch (_error) {
     console.log("logout error:", _error);

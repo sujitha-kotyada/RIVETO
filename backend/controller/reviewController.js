@@ -2,7 +2,14 @@ import mongoose from "mongoose";
 import Review from "../model/reviewModel.js";
 import Product from "../model/productModel.js";
 import User from "../model/userModel.js";
-import { sendNotification } from "../services/notificationService.js";
+import {
+  sendNotification,
+  emitActivity,
+} from "../services/notificationService.js";
+
+// 1. Import and initialize the sentiment library
+import Sentiment from 'sentiment';
+const sentiment = new Sentiment();
 
 async function recalculateProductRating(productId) {
   const result = await Review.aggregate([
@@ -45,6 +52,19 @@ export const addReview = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
+    // 2. Perform the sentiment analysis on the comment text
+    let sentimentScore = 0;
+    let sentimentLabel = 'Neutral';
+
+    if (comment && comment.trim().length > 0) {
+      const result = sentiment.analyze(comment);
+      sentimentScore = result.score;
+      
+      // Assign labels based on the score threshold
+      if (sentimentScore >= 2) sentimentLabel = 'Positive';
+      else if (sentimentScore <= -2) sentimentLabel = 'Negative';
+    }
+
     const existingReview = await Review.findOne({
       userId: req.userId,
       productId,
@@ -53,6 +73,10 @@ export const addReview = async (req, res) => {
     if (existingReview) {
       existingReview.rating = rating;
       existingReview.comment = comment;
+      // 3. Update existing review with new sentiment data
+      existingReview.sentimentScore = sentimentScore;
+      existingReview.sentimentLabel = sentimentLabel;
+      
       await existingReview.save();
 
       const { avgRating, reviewCount } = await recalculateProductRating(productId);
@@ -65,12 +89,15 @@ export const addReview = async (req, res) => {
       });
     }
 
+    // 4. Create new review with sentiment data attached
     const newReview = new Review({
       userId: req.userId,
       productId,
       name: user.name,
       rating,
       comment,
+      sentimentScore,
+      sentimentLabel
     });
 
     await newReview.save();
@@ -80,6 +107,16 @@ export const addReview = async (req, res) => {
       title: "New Product Review",
       message: `${user.name} reviewed "${product.name}" with a ${rating}-star rating.`,
       type: "new_review",
+    });
+
+    emitActivity({
+      type: "review_added",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      action: `Reviewed "${product.name}" with ${rating} stars`,
     });
 
     const { avgRating, reviewCount } = await recalculateProductRating(productId);
@@ -137,20 +174,17 @@ export const deleteReview = async (req, res) => {
       });
     }
 
+    await review.deleteOne();
 
-await review.deleteOne();
+    const { avgRating, reviewCount } = await recalculateProductRating(
+      review.productId
+    );
 
-const { avgRating, reviewCount } = await recalculateProductRating(
-  review.productId
-);
-
-return res.status(200).json({
-  message: "Review deleted successfully",
-  avgRating,
-  reviewCount,
-});
-
-
+    return res.status(200).json({
+      message: "Review deleted successfully",
+      avgRating,
+      reviewCount,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error" });
