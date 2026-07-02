@@ -202,6 +202,30 @@ function ProductDetail() {
     setIsEditingReview(true);
   };
 
+  const handleDeleteReview = async () => {
+  if (!userReview) return;
+
+  const confirmed = window.confirm(
+    'Are you sure you want to delete your review?'
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const response = await apiConfig.delete(`/review/${userReview._id}`);
+
+    toast.success(response.data.message);
+
+    setReviewComment('');
+    setReviewRating(5);
+    setIsEditingReview(false);
+
+    fetchReviews();
+  } catch {
+    // API errors are shown by the global interceptor.
+  }
+};
+
   const handleCancelEdit = () => {
     setReviewComment('');
     setReviewRating(5);
@@ -568,17 +592,28 @@ function ProductDetail() {
                 {userReview && !isEditingReview ? (
                   <div className="bg-slate-100 dark:bg-gray-800/50 p-6 rounded-xl border border-cyan-400/40">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
-                        Your Review
-                      </h3>
-                      <button
-                        type="button"
-                        onClick={handleEditReview}
-                        className="text-cyan-400 hover:text-cyan-300 text-sm font-medium"
-                      >
-                        Edit Review
-                      </button>
-                    </div>
+  <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
+    Your Review
+  </h3>
+
+  <div className="flex items-center gap-3">
+    <button
+      type="button"
+      onClick={handleEditReview}
+      className="text-cyan-400 hover:text-cyan-300 text-sm font-medium"
+    >
+      Edit Review
+    </button>
+
+    <button
+      type="button"
+      onClick={handleDeleteReview}
+      className="text-red-500 hover:text-red-400 text-sm font-medium"
+    >
+      Delete Review
+    </button>
+  </div>
+</div>
                     <div className="flex gap-1 mb-2" aria-hidden="true">
                       {[...Array(userReview.rating)].map((_, i) => (
                         <FaStar key={i} className="text-yellow-400" />
