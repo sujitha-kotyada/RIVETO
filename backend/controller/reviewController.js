@@ -153,3 +153,40 @@ export const getProductReviews = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const deleteReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+      return res.status(400).json({ message: "Invalid review ID" });
+    }
+
+    const review = await Review.findById(reviewId);
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    if (review.userId.toString() !== req.userId) {
+      return res.status(403).json({
+        message: "You are not authorized to delete this review",
+      });
+    }
+
+    await review.deleteOne();
+
+    const { avgRating, reviewCount } = await recalculateProductRating(
+      review.productId
+    );
+
+    return res.status(200).json({
+      message: "Review deleted successfully",
+      avgRating,
+      reviewCount,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
