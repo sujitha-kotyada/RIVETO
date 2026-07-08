@@ -15,9 +15,20 @@ const missingFirebaseEnv = requiredFirebaseEnv.filter(
 );
 
 if (missingFirebaseEnv.length > 0) {
-  throw new Error(
-    `Missing Firebase environment variables: ${missingFirebaseEnv.join(', ')}`
-  );
+  const message = `Configuration error: missing environment variables (${missingFirebaseEnv.join(
+    ', '
+  )}). The site owner needs to add these in the hosting dashboard.`;
+
+  // React hasn't mounted yet at this point, so we write directly to the DOM
+  // to avoid leaving the user with a silent blank white screen.
+  document.body.innerHTML = `
+    <div style="font-family: sans-serif; max-width: 480px; margin: 80px auto; padding: 24px; text-align: center; color: #333;">
+      <h2 style="color:#c0392b;">Something's misconfigured</h2>
+      <p>${message}</p>
+    </div>
+  `;
+
+  throw new Error(message);
 }
 
 const firebaseConfig = {
