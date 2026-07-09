@@ -48,7 +48,11 @@ export const placeOrder = async (req, res) => {
     return res.status(201).json({ message: "Order Placed" });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Order Place error" });
+    return res.status(500).json({
+      success: false,
+      message: "Order Place error",
+      errors: [error.message],
+    });
   }
 };
 
@@ -59,7 +63,11 @@ export const userOrders = async (req, res) => {
     return res.status(200).json(orders);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "userOrders error" }); // ❗ Fixed 200 → 500
+    return res.status(500).json({
+      success: false,
+      message: "userOrders error",
+      errors: [error.message],
+    }); // ❗ Fixed 200 → 500
   }
 };
 
@@ -71,7 +79,11 @@ export const allOrders = async (req, res) => {
     res.status(200).json(orders);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "adminAllOrders error" });
+    return res.status(500).json({
+      success: false,
+      message: "adminAllOrders error",
+      errors: [error.message],
+    });
   }
 };
 
@@ -103,6 +115,10 @@ export const updateStatus = async (req, res) => {
 
     return res.status(201).json({ message: "Status Updated" });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update order status",
+      errors: [error.message],
+    });
   }
 };

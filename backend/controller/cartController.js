@@ -77,3 +77,16 @@ export const getUserCart = async (req, res) => {
     return res.status(500).json({ message: "getUserCart error" });
   }
 };
+// ✅ Clear cart entirely
+export const clearCart = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) return res.status(400).json({ message: "Missing user ID" });
+
+    await User.findByIdAndUpdate(userId, { cartData: {} });
+    return res.status(200).json({ message: "Cart cleared successfully" });
+  } catch (error) {
+    console.log("clearCart error:", error);
+    return res.status(500).json({ message: "clearCart error" });
+  }
+};
