@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useMemo, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { shopDataContext } from '../context/ShopContext';
 import { toast } from 'react-toastify';
 import { userDataContext } from '../context/UserContext';
@@ -10,6 +10,7 @@ import RelatedProduct from '../components/RelatedProduct';
 import { recordGuestView } from '../utils/guestViewHistory';
 
 function ProductDetail() {
+  const navigate = useNavigate();
   const { userData } = useContext(userDataContext);
   const { productId } = useParams();
 
@@ -33,6 +34,7 @@ function ProductDetail() {
   const [activeTab, setActiveTab] = useState('description');
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isCartActionTriggered, setIsCartActionTriggered] = useState(false);
   const sizeGroupRef = useRef(null);
 
   const [reviews, setReviews] = useState([]);
@@ -106,6 +108,7 @@ function ProductDetail() {
       setSelectedImage(found.image1);
     }
 
+    setIsCartActionTriggered(false);
     fetchReviews();
   }, [productId, product, fetchReviews]);
 
@@ -137,6 +140,7 @@ function ProductDetail() {
 
     addtoCart(productData._id, size, quantity);
     toast.success(`${quantity} x ${productData.name} added to cart!`);
+    setIsCartActionTriggered(true);
   };
 
   const handleAddToWishlist = () => {
@@ -495,12 +499,11 @@ function ProductDetail() {
 
             <button
               type="button"
-              onClick={handleAddToCart}
+              onClick={isCartActionTriggered ? () => navigate('/cart') : handleAddToCart}
               className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 rounded-lg flex items-center justify-center gap-3"
             >
               <FaShoppingCart aria-hidden="true" />
-              Add to Cart - {currency}
-              {(productData.price * quantity).toLocaleString()}
+              {isCartActionTriggered ? 'Go to Cart' : `Add to Cart - ${currency}${(productData.price * quantity).toLocaleString()}`}
             </button>
 
             <div className="flex gap-3">
