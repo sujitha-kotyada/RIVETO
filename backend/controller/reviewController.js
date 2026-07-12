@@ -6,6 +6,7 @@ import {
   sendNotification,
   emitActivity,
 } from "../services/notificationService.js";
+import logger from "../config/logger.js";
 
 // 1. Import and initialize the sentiment library
 import Sentiment from 'sentiment';
@@ -132,7 +133,7 @@ export const addReview = async (req, res) => {
       return res.status(409).json({ message: "You have already reviewed this product" });
     }
 
-    console.log(error);
+    logger.error("addReview error", { error: error.message });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -149,7 +150,7 @@ export const getProductReviews = async (req, res) => {
 
     res.status(200).json(reviews);
   } catch (error) {
-    console.log(error);
+    logger.error("getProductReviews error", { error: error.message });
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -186,7 +187,7 @@ export const deleteReview = async (req, res) => {
       reviewCount,
     });
   } catch (error) {
-    console.log(error);
+    logger.error("deleteReview error", { error: error.message });
     res.status(500).json({ message: "Server error" });
   }
 };

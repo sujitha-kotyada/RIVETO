@@ -4,6 +4,7 @@ import {
   sendNotification,
   emitActivity,
 } from "../services/notificationService.js";
+import logger from "../config/logger.js";
 
 //for user//
 export const placeOrder = async (req, res) => {
@@ -47,7 +48,7 @@ export const placeOrder = async (req, res) => {
 
     return res.status(201).json({ message: "Order Placed" });
   } catch (error) {
-    console.log(error);
+    logger.error("placeOrder error", { error: error.message });
     return res.status(500).json({
       success: false,
       message: "Order Place error",
@@ -62,7 +63,7 @@ export const userOrders = async (req, res) => {
     const orders = await Order.find({ userId });
     return res.status(200).json(orders);
   } catch (error) {
-    console.log(error);
+    logger.error("userOrders error", { error: error.message });
     return res.status(500).json({
       success: false,
       message: "userOrders error",
@@ -78,7 +79,7 @@ export const allOrders = async (req, res) => {
     const orders = await Order.find({});
     res.status(200).json(orders);
   } catch (error) {
-    console.log(error);
+    logger.error("allOrders error", { error: error.message });
     return res.status(500).json({
       success: false,
       message: "adminAllOrders error",

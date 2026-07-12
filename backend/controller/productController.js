@@ -2,6 +2,7 @@ import uploadOnCloudinary from "../config/Cloudinary.js";
 import Product from "../model/productModel.js";
 import { emitActivity } from "../services/notificationService.js";
 import Review from "../model/reviewModel.js";
+import logger from "../config/logger.js";
 
 const safeUpload = async (fileArray) => {
   const filePath = fileArray?.[0]?.path;
@@ -23,7 +24,7 @@ const safeUpload = async (fileArray) => {
 };
 
 export const addProduct = async (req, res) => {
-  console.log("✅ Request files:", req.files);
+  logger.debug("Request files received", { files: req.files });
 
   try {
     const {
@@ -36,7 +37,7 @@ export const addProduct = async (req, res) => {
       bestseller,
     } = req.body;
 
-    console.log("✅ Request body:", req.body);
+    logger.debug("Request body received", { body: req.body });
 
     // Upload images in parallel and tolerate missing files.
     const [image1, image2, image3, image4] = await Promise.all([
@@ -70,7 +71,7 @@ export const addProduct = async (req, res) => {
             });
           }
         } catch (parseError) {
-          console.error("❌ Invalid sizes JSON in addProduct:", parseError);
+          logger.error("Invalid sizes JSON in addProduct", { error: parseError.message });
           return res.status(400).json({
             success: false,
             message: "Invalid sizes JSON.",
@@ -114,7 +115,7 @@ export const addProduct = async (req, res) => {
 
     return res.status(201).json(createdProduct);
   } catch (error) {
-    console.error("❌ Error in addProduct:", error);
+    logger.error("Error in addProduct", { error: error.message });
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -158,7 +159,7 @@ const productsWithReviewCount = await Promise.all(
       },
     });
   } catch (error) {
-    console.error("❌ Error in listProducts:", error);
+    logger.error("Error in listProducts", { error: error.message });
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -186,7 +187,7 @@ export const removeProduct = async (req, res) => {
       .status(200)
       .json({ message: "Product deleted successfully", product });
   } catch (error) {
-    console.error("❌ Error in removeProduct:", error);
+    logger.error("Error in removeProduct", { error: error.message });
     return res.status(500).json({
       success: false,
       message: "Internal server error",
