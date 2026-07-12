@@ -11,9 +11,13 @@ import orderRoutes from "./routes/orderRoutes.js";
 import reviewRoutes from "./routes/reviewRoute.js";
 import wishlistRouter from "./routes/wishlistRoutes.js";
 import recommendationsRoute from "./routes/recommendations.js";
-import { globalIpLimiter } from "./middleware/rateLimiters.js";
 import errorHandler from "./middleware/errorHandler.js";
-
+import { fileURLToPath } from "url";
+import path from "path";
+import fs from "fs";
+import express from "express";
+import botRoute from "./routes/bot.js";
+import notificationRouter from "./routes/notificationRoutes.js";
 
 const PORT = process.env.PORT || 3000;
 const server = createServer(app);
@@ -30,7 +34,7 @@ if (process.env.NODE_ENV !== "production") {
 
 // API routes
 app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes); 
+app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
@@ -39,7 +43,6 @@ app.use("/api/wishlist", wishlistRouter);
 app.use("/api/recommendations", recommendationsRoute);
 app.use("/api/notifications", notificationRouter);
 app.use("/api", botRoute);
-
 
 app.get("/", (req, res) => res.send("Backend is running!"));
 app.use(errorHandler);
