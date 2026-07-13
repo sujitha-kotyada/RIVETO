@@ -1,5 +1,6 @@
 import express from "express";
 import { getRecommendations } from "../services/recommendationService.js";
+import logger from "../config/logger.js";
 
 const router = express.Router();
 
@@ -30,7 +31,7 @@ router.get("/", async (req, res) => {
       results,
     });
   } catch (error) {
-    console.error("Failed to fetch recommendations:", error.message);
+    logger.error("Failed to fetch recommendations", { error: error.message });
     res.status(500).json({ error: "Failed to fetch recommendations" });
   }
 });

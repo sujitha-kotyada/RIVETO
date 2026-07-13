@@ -1,8 +1,14 @@
 import "./env.js";
 import { createServer } from "http";
+import { fileURLToPath } from "url";
+import path from "path";
+import fs from "fs";
+import express from "express";
+
 import { initSocket } from "./services/notificationService.js";
 import connectdb from "./config/db.js";
 import app from "./app.js";
+
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
@@ -11,13 +17,12 @@ import orderRoutes from "./routes/orderRoutes.js";
 import reviewRoutes from "./routes/reviewRoute.js";
 import wishlistRouter from "./routes/wishlistRoutes.js";
 import recommendationsRoute from "./routes/recommendations.js";
-import errorHandler from "./middleware/errorHandler.js";
-import { fileURLToPath } from "url";
-import path from "path";
-import fs from "fs";
-import express from "express";
-import botRoute from "./routes/bot.js";
 import notificationRouter from "./routes/notificationRoutes.js";
+import botRoute from "./routes/bot.js";
+
+import errorHandler from "./middleware/errorHandler.js";
+import errorHandler from "./middleware/errorHandler.js";
+import logger from "./config/logger.js";
 
 const PORT = process.env.PORT || 3000;
 const server = createServer(app);
@@ -45,19 +50,23 @@ app.use("/api/notifications", notificationRouter);
 app.use("/api", botRoute);
 
 app.get("/", (req, res) => res.send("Backend is running!"));
+
 app.use(errorHandler);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const frontendBuildPath = path.join(__dirname, "frontend/build");
-// dotenv.config({ path: path.join(__dirname, ".env") }); // ← explicit path
+
 if (fs.existsSync(frontendBuildPath)) {
   app.use(express.static(frontendBuildPath));
+
   app.get("*", (req, res) => {
     res.sendFile(path.join(frontendBuildPath, "index.html"));
   });
 }
 
+app.use(errorHandler);
+
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  logger.info(`🚀 Server running on port ${PORT}`);
 });
